@@ -1,0 +1,130 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: "spire-agent"
+  namespace: "spire-mgmt"
+  labels:
+    helm.sh/chart: "spire-agent-0.1.0"
+    app.kubernetes.io/name: "agent"
+    app.kubernetes.io/instance: "spire"
+    app.kubernetes.io/version: "1.11.2"
+    app.kubernetes.io/managed-by: "Helm"
+    app.kubernetes.io/component: "default"
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: "agent"
+      app.kubernetes.io/instance: "spire"
+      app.kubernetes.io/component: "default"
+  updateStrategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
+  template:
+    metadata:
+      annotations:
+        kubectl.kubernetes.io/default-container: spire-agent
+        checksum/config: "444daeb8a4d4c47703dd4578a6eccc41eeeeef95d5bf98f3a05ca5a736c64a9a"
+      labels:
+        app.kubernetes.io/name: "agent"
+        app.kubernetes.io/instance: "spire"
+        app.kubernetes.io/component: "default"
+    spec:
+      hostPID: true
+      hostNetwork: true
+      dnsPolicy: ClusterFirstWithHostNet
+      serviceAccountName: "spire-agent"
+      securityContext:
+        {}
+
+      initContainers:
+        - name: ensure-alternate-names
+          image: "cgr.dev/chainguard/bash:latest@sha256:bcaf350e298d474d12901adf9a1e78d8cf470d4434a82e0c718d514fc2032fa7"
+          imagePullPolicy: "Always"
+          command: ["bash", "-xc"]
+          args:
+            - |
+              cd /run/spire/agent-sockets
+              L=`readlink socket`
+              [ "x$L" != "xspire-agent.sock" ] && rm -f socket
+              [ ! -L socket ] && ln -s spire-agent.sock socket
+              L=`readlink api.sock`
+              [ "x$L" != "xspire-agent.sock" ] && rm -f api.sock
+              [ ! -L api.sock ] && ln -s spire-agent.sock api.sock
+              [ -L spire-agent.sock ] && rm -f spire-agent.sock
+              exit 0
+          resources:
+            {}
+          volumeMounts:
+            - name: spire-agent-socket-dir
+              mountPath: /run/spire/agent-sockets
+          securityContext:
+            runAsUser: 0
+            runAsGroup: 0
+      containers:
+        - name: "spire-agent"
+          image: "ghcr.io/spiffe/spire-agent:1.11.2"
+          imagePullPolicy: "IfNotPresent"
+          args: ["-config", "/opt/spire/conf/agent/agent.conf"]
+          securityContext:
+            {}
+          env:
+            - name: PATH
+              value: "/opt/spire/bin:/bin"
+            - name: MY_NODE_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: spec.nodeName
+          ports:
+            - containerPort: 9982
+              name: healthz
+          volumeMounts:
+            - name: spire-config
+              mountPath: /opt/spire/conf/agent
+              readOnly: true
+            - name: spire-agent-persistence
+              mountPath: /var/lib/spire
+            - name: spire-bundle
+              readOnly: true
+              mountPath: /run/spire/bundle
+            - name: spire-agent-socket-dir
+              mountPath: /tmp/spire-agent/public
+              readOnly: false
+            - name: spire-token
+              mountPath: /var/run/secrets/tokens
+          livenessProbe:
+            httpGet:
+              path: /live
+              port: healthz
+            initialDelaySeconds: 15
+            periodSeconds: 60
+          readinessProbe:
+            httpGet:
+              path: /ready
+              port: healthz
+            initialDelaySeconds: 10
+            periodSeconds: 30
+          resources:
+            {}
+      volumes:
+        - name: spire-config
+          configMap:
+            name: spire-agent
+        - name: spire-agent-admin-socket-dir
+          emptyDir: {}
+        - name: spire-agent-persistence
+          emptyDir: {}
+        - name: spire-bundle
+          configMap:
+            name: "spire-bundle"
+        - name: spire-token
+          projected:
+            sources:
+            - serviceAccountToken:
+                path: spire-agent
+                expirationSeconds: 7200
+                audience: spire-server
+        - name: spire-agent-socket-dir
+          hostPath:
+            path: /run/spire/agent-sockets
+            type: DirectoryOrCreate
