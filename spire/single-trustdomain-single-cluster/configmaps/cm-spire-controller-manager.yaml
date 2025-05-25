@@ -16,7 +16,6 @@ data:
         app.kubernetes.io/name: server
         app.kubernetes.io/instance: spire
         app.kubernetes.io/version: "1.11.2"
-#        app.kubernetes.io/managed-by: Helm
         app.kubernetes.io/managed-by: ztwim
     metrics:
       bindAddress: 0.0.0.0:8082
@@ -27,15 +26,15 @@ data:
       resourceName: bb21182e.spiffe.io
       resourceNamespace: spire-mgmt
     validatingWebhookConfigurationName: spire-mgmt-spire-controller-manager-webhook
-    entryIDPrefix: example-cluster
-    clusterName: example-cluster
+    entryIDPrefix: tgeer-test
+    clusterName: tgeer-test
     trustDomain: apps.tgeer-test.devcluster.openshift.com
     ignoreNamespaces:
       - kube-system
       - kube-public
       - local-path-storage
       - openshift-.*
-#      - ibm-.*
+      - ibm-.*
     spireServerSocketPath: "/tmp/spire-server/private/api.sock"
     className: "spire-mgmt-spire"
     watchClassless: false

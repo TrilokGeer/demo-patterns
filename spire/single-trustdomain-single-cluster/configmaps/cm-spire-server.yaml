@@ -42,7 +42,7 @@ data:
               "plugin_data": {
                 "clusters": [
                   {
-                    "example-cluster": {
+                    "tgeer-test": {
                       "allowed_node_label_keys": [],
                       "allowed_pod_label_keys": [],
                       "audience": [

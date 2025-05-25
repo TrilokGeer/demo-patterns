@@ -1,0 +1,18 @@
+apiVersion: spire.spiffe.io/v1alpha1
+kind: ClusterSPIFFEID
+metadata:
+  name: spire-svid-test
+spec:
+  className: "spire-mgmt-spire"
+  hint: spire-svid-test
+  spiffeIDTemplate: spiffe://example.org/ns/svid-test/sa/svid-test
+  podSelector:
+    matchLabels:
+      app: svid-test
+      release: test
+  namespaceSelector:
+    matchExpressions:
+    - key: kubernetes.io/metadata.name
+      operator: In
+      values:
+      - svid-test

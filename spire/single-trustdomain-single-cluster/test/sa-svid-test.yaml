@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: svid-test
+  namespace: svid-test
+  labels:
+    app.kubernetes.io/name: svid-test
+

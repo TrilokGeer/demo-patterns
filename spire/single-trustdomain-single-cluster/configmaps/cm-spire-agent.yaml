@@ -35,7 +35,7 @@ data:
           {
             "k8s_psat": {
               "plugin_data": {
-                "cluster": "example-cluster"
+                "cluster": "tgeer-test"
               }
             }
           }

@@ -39,7 +39,7 @@ spec:
 
       initContainers:
         - name: ensure-alternate-names
-          image: "cgr.dev/chainguard/bash:latest@sha256:bcaf350e298d474d12901adf9a1e78d8cf470d4434a82e0c718d514fc2032fa7"
+          image: "registry.access.redhat.com/ubi9:9.6-1747219013"
           imagePullPolicy: "Always"
           command: ["bash", "-xc"]
           args:
