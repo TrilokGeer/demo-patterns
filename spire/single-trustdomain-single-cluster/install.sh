@@ -18,6 +18,7 @@ commands=(
 	"oc create -f apps"
 	"oc create -f deployment"
 	"oc wait --for=condition=ready pod -l app.kubernetes.io/name=spiffe-oidc-discovery-provider -n spire-mgmt --timeout=300s"
+	"oc create -f route"
 	"oc create -f test/test-namespace.yaml"
 	"oc create -f test/sa-svid-test.yaml"
 	"oc create -f test/scc-test-pod.yaml"

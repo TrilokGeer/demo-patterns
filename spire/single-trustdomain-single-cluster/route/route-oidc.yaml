@@ -1,0 +1,15 @@
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: oidc-discovery
+  namespace: spire-mgmt
+spec:
+  host: oidc-discovery.apps.tgeer-test.devcluster.openshift.com
+  to:
+    kind: Service
+    name: spire-spiffe-oidc-discovery-provider
+  port:
+    targetPort: https
+  tls:
+    termination: passthrough
+

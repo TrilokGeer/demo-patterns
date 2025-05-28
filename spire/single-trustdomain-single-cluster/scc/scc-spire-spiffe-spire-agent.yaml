@@ -31,16 +31,3 @@ fsGroup:
 groups: []
 priority: null
 requiredDropCapabilities: null
----
-# Source: spire/charts/spire-server/templates/controller-manager-webhook.yaml
-apiVersion: admissionregistration.k8s.io/v1
-kind: ValidatingWebhookConfiguration
-metadata:
-  name: spire-mgmt-spire-controller-manager-webhook
-fsGroup:
-  type: RunAsAny
-groups: []
-priority: null
-requiredDropCapabilities: null
-seccompProfiles:
-  - '*'
