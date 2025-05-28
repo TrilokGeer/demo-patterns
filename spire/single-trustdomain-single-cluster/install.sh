@@ -2,7 +2,7 @@ set -euo pipefail
 set -x  # print each command as it runs
 
 commands=(
-        "oc new-project spire-mgmgt"
+        "oc new-project spire-mgmt"
 	"oc create -f rbac"
 	"oc create -f scc"
 	"oc create -f service"

@@ -10,9 +10,4 @@ spec:
     matchLabels:
       app: svid-test
       release: test
-  namespaceSelector:
-    matchExpressions:
-    - key: kubernetes.io/metadata.name
-      operator: In
-      values:
-      - svid-test
+  namespace: svid-test
