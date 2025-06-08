@@ -3,6 +3,7 @@ set -x  # print each command as it runs
 
 commands=(
         "oc new-project spire-mgmt"
+	"oc label namespace spire-mgmt openshift.io/cluster-monitoring=true"
 	"oc create -f rbac"
 	"oc create -f scc"
 	"oc create -f service"
@@ -19,6 +20,7 @@ commands=(
 	"oc create -f deployment"
 	"oc wait --for=condition=ready pod -l app.kubernetes.io/name=spiffe-oidc-discovery-provider -n spire-mgmt --timeout=300s"
 	"oc create -f route"
+	"oc create -f servicemonitor"
 	"oc create -f test/test-namespace.yaml"
 	"oc create -f test/sa-svid-test.yaml"
 	"oc create -f test/scc-test-pod.yaml"
@@ -31,6 +33,11 @@ testCommands=(
 	"oc cp ./bin/spire-1.11.2/bin/spire-agent svid-test/spire-svid-test:/spire-agent -c test"
 	"oc exec -it spire-svid-test -n svid-test  -- /spire-agent api fetch x509 -socketPath /spiffe-workload-api/api.sock"
 	"oc exec -it spire-server-0 -c spire-server -- /opt/spire/bin/spire-server entry show"
+	"curl -k https://oidc-discovery.apps.tgeer-test.devcluster.openshift.com/keys"
+#"export ISSUER=https://oidc-discovery.apps.tgeer-test.devcluster.openshift.com"
+#"export OIDCURL=\"https://oidc-discovery.apps.tgeer-test.devcluster.openshift.com/keys\""
+#"export AUD=svid-test"
+#"export TOKEN=$(oc exec -it spire-svid-test -n svid-test  -- /spire-agent api fetch jwt -audience svid-test -socketPath /spiffe-workload-api/api.sock -output json | jq -r '.[0].svids[0].svid')"
 )
 
 # Show help if no arguments
