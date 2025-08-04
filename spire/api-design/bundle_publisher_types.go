@@ -1,5 +1,10 @@
 package v1alpha1
 
+const (
+	BundlePublisherTypeAWSS3 = "aws_s3"
+	BundlePublisherTypeGCS   = "gcs"
+)
+
 type BundlePublisher struct {
 	// type specifies the type of bundle publisher to use.
 	// +kubebuilder:validation:Enum=aws_s3;gcs;

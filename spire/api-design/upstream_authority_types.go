@@ -1,5 +1,13 @@
 package v1alpha1
 
+const (
+	UpstreamAuthorityTypeDisk      = "disk"
+	UpstreamAuthorityTypeAWSPCA    = "aws_pca"
+	UpstreamAuthorityTypeAWSSecret = "aws_secret"
+	UpstreamAuthorityTypeGCPCAS    = "gcp_cas"
+	UpstreamAuthorityTypeVault     = "vault"
+)
+
 // UpstreamCA has the config required for the spire server upstream CA.
 type UpstreamCA struct {
 	// Type is the SPIRE UpstreamAuthority plugin type (e.g., "disk", "aws_pca")

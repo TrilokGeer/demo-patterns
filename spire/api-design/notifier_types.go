@@ -1,5 +1,10 @@
 package v1alpha1
 
+const (
+	NotifierTypeGCSBundle = "gcs_bundle"
+	NotifierTypeK8SBundle = "k8s_bundle"
+)
+
 type Notifier struct {
 	// type specifies the type of notifier to use.
 	// +kubebuilder:validation:Enum=spire-server;spire-agent

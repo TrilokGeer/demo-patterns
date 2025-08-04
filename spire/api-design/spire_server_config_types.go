@@ -39,29 +39,33 @@ type SpireServerSpec struct {
 
 	// spireSQLConfig has the config required for the spire server SQL DataStore.
 	// +kubebuilder:validation:Optional
-	Datastore *DataStoreConfig `json:"datastore,omitempty"`
+	Datastore *DataStore `json:"datastore,omitempty"`
 
 	// upstreamCAConfig has the config required for the spire server upstream CA.
 	// +kubebuilder:validation:Optional
-	UpstreamCAConfig *UpstreamCAConfig `json:"upstreamCAConfig,omitempty"`
+	UpstreamCA *UpstreamCA `json:"upstreamCA,omitempty"`
 
 	// notifierConfig has the config required for the spire server notifier.
 	// +kubebuilder:validation:Optional
-	NotifierConfig *NotifierConfig `json:"notifierConfig,omitempty"`
+	Notifier *Notifier `json:"notifier,omitempty"`
 
 	// bundlePublisherConfig has the config required for the spire server bundle publisher.
 	// aws_anywhere is a special case where the bundle publisher is configured to publish bundles to AWS Anywhere
 	// and is not supported for now.
 	// +kubebuilder:validation:Optional
-	BundlePublisherConfig *BundlePublisherConfig `json:"bundlePublisherConfig,omitempty"`
+	BundlePublisher *BundlePublisher `json:"bundlePublisher,omitempty"`
+
+	// nodeAttestor has the config required for the spire server node attestor.
+	// +kubebuilder:validation:Optional
+	NodeAttestor *NodeAttestor `json:"nodeAttestor,omitempty"`
 
 	// deploymentConfig has the config required for the spire server deployment.
 	// +kubebuilder:validation:Optional
 	Deployment `json:",inline"`
 }
 
-// DataStoreConfig configures the Spire SQL datastore backend.
-type DataStoreConfig struct {
+// DataStore configures the Spire SQL datastore backend.
+type DataStore struct {
 	// databaseType specifies type of database to use.
 	// +kubebuilder:validation:Enum=sql;sqlite3;postgres;mysql;aws_postgresql;aws_mysql
 	// +kubebuilder:default:=sqlite3
@@ -104,17 +108,6 @@ type DataStoreConfig struct {
 	// +kubebuilder:validation:Enum:="true";"false"
 	// +kubebuilder:validation:Optional
 	DisableMigration string `json:"disableMigration"`
-}
-
-type KeyManagerConfig struct {
-	// type specifies the type of key manager to use.
-	// +kubebuilder:validation:Enum=aws_kms;memory;disk
-	// +kubebuilder:default:=memory
-	Type string `json:"type"`
-
-	// pluginConfig has the config required for the spire server key manager.
-	// +kubebuilder:validation:Optional
-	PluginConfig map[string]interface{} `json:"pluginConfig,omitempty"`
 }
 
 // CASubject defines the subject information for the Spire CA.

@@ -1,5 +1,11 @@
 package v1alpha1
 
+const (
+	KeyManagerTypeMemory = "memory"
+	KeyManagerTypeDisk   = "disk"
+	KeyManagerTypeAWSKMS = "aws_kms"
+)
+
 type KeyManager struct {
 	// type specifies the type of bundle publisher to use.
 	// +kubebuilder:validation:Enum=aws_s3;gcs;
