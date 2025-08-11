@@ -78,15 +78,15 @@ type ZeroTrustWorkloadIdentityManagerSpec struct {
 	// zero-trust-workload-identity-manager.
 	// +kubebuilder:validation:Optional
 	// +kubebuilder:default:="zero-trust-workload-identity-manager"
-	Namespace string `json:"namespace,omitempty"`
+	Namespace string `json:"namespace"`
 
 	// trustDomain to be used for the SPIFFE identifiers
 	// +kubebuilder:validation:Required
-	TrustDomain string `json:"trustDomain,omitempty"`
+	TrustDomain string `json:"trustDomain"`
 
 	// clusterName will have the cluster name required to configure spire server.
 	// +kubebuilder:validation:Required
-	ClusterName string `json:"clusterName,omitempty"`
+	ClusterName string `json:"clusterName"`
 
 	// bundleConfigMap is Configmap name for Spire bundle, it sets the trust domain to be used for the SPIFFE identifiers
 	// +kubebuilder:validation:Optional
