@@ -10,11 +10,38 @@ const (
 
 // UpstreamCA has the config required for the spire server upstream CA.
 type UpstreamCA struct {
-	// Type is the SPIRE UpstreamAuthority plugin type (e.g., "disk", "aws_pca")
+	// Type is the SPIRE UpstreamAuthority plugin type (e.g., "disk", "aws_pca", "aws_secret", "gcp_cas", "vault", "spire", "cert_manager")
+	// +kubebuilder:validation:Enum=disk;aws_pca;aws_secret;gcp_cas;vault;spire;cert_manager
+	// +kubebuilder:default:=disk
 	Type string `json:"type"`
 
-	// PluginConfig holds plugin-specific configuration as appendable JSON
-	PluginConfig map[string]interface{} `json:"pluginConfig,omitempty"`
+	// UpstreamAuthorityDisk contains the config for the spire server disk upstream authority.
+	// +kubebuilder:validation:Optional
+	UpstreamAuthorityDisk *UpstreamAuthorityDisk `json:"disk,omitempty"`
+
+	// UpstreamAuthorityAWSPCA contains the config for the spire server AWS PCA upstream authority.
+	// +kubebuilder:validation:Optional
+	UpstreamAuthorityAWSPCA *UpstreamAuthorityAWSPCA `json:"awsPca,omitempty"`
+
+	// UpstreamAuthorityAWSSecret contains the config for the spire server AWS Secret upstream authority.
+	// +kubebuilder:validation:Optional
+	UpstreamAuthorityAWSSecret *UpstreamAuthorityAWSSecret `json:"awsSecret,omitempty"`
+
+	// UpstreamGCPCAS contains the config for the spire server GCP CAS upstream authority.
+	// +kubebuilder:validation:Optional
+	UpstreamGCPCAS *UpstreamGCPCAS `json:"gcpCas,omitempty"`
+
+	// UpstreamAuthorityVault contains the config for the spire server Vault upstream authority.
+	// +kubebuilder:validation:Optional
+	UpstreamAuthorityVault *UpstreamAuthorityVault `json:"vault,omitempty"`
+
+	// UpstreamAuthoritySpire contains the config for the spire server Spire upstream authority.
+	// +kubebuilder:validation:Optional
+	UpstreamAuthoritySpire *UpstreamAuthoritySpire `json:"spire,omitempty"`
+
+	// UpstreamAuthorityCertManager contains the config for the spire server Cert Manager upstream authority.
+	// +kubebuilder:validation:Optional
+	UpstreamAuthorityCertManager *UpstreamAuthorityCertManager `json:"certManager,omitempty"`
 }
 
 type UpstreamAuthorityDisk struct {

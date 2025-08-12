@@ -7,27 +7,21 @@ const (
 
 type BundlePublisher struct {
 	// type specifies the type of bundle publisher to use.
-	// +kubebuilder:validation:Enum=aws_s3;gcs;
+	// +kubebuilder:validation:Enum=aws_s3;gcs;aws_rolesanywhere_trustanchor
 	// +kubebuilder:default:=aws_s3
 	Type string `json:"type"`
 
-	// pluginConfig has the config required for the spire server bundle publisher.
+	// BundlePublisherAWSS3 contains the config for the AWS S3 bundle publisher.
 	// +kubebuilder:validation:Optional
-	PluginConfig map[string]interface{} `json:"pluginConfig,omitempty"`
+	BundlePublisherAWSS3 *BundlePublisherAWSS3 `json:"awsS3,omitempty"`
+
+	// BundlePublisherGCS contains the config for the GCS bundle publisher.
+	// +kubebuilder:validation:Optional
+	BundlePublisherGCS *BundlePublisherGCS `json:"gcs,omitempty"`
 }
 
 type BundlePublisherAWSS3 struct {
-	// region is the AWS region.
-	// +kubebuilder:validation:Optional
-	Region string `json:"region,omitempty"`
-
-	// accessKeyID is the AWS access key ID.
-	// +kubebuilder:validation:Optional
-	AccessKeyID string `json:"accessKeyID,omitempty"`
-
-	// secretAccessKey is the AWS secret access key.
-	// +kubebuilder:validation:Optional
-	SecretAccessKey string `json:"secretAccessKey,omitempty"`
+	AWSAccessConfig
 
 	// bucketName is the name of the S3 bucket.
 	// +kubebuilder:validation:Optional

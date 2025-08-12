@@ -7,14 +7,28 @@ const (
 )
 
 type KeyManager struct {
-	// type specifies the type of bundle publisher to use.
-	// +kubebuilder:validation:Enum=aws_s3;gcs;
-	// +kubebuilder:default:=aws_s3
+	// type specifies the type of key manager to use.
+	// +kubebuilder:validation:Enum=memory;disk;aws_kms
+	// +kubebuilder:default:=memory
 	Type string `json:"type"`
 
-	// pluginConfig has the config required for the spire server bundle publisher.
+	// KeyManagerMemory contains the config for the spire server memory key manager.
 	// +kubebuilder:validation:Optional
-	PluginConfig map[string]interface{} `json:"pluginConfig,omitempty"`
+	KeyManagerMemory *KeyManagerMemory `json:"keyManagerMemory,omitempty"`
+
+	// KeyManagerDisk contains the config for the spire server disk key manager.
+	// +kubebuilder:validation:Optional
+	KeyManagerDisk *KeyManagerDisk `json:"keyManagerDisk,omitempty"`
+
+	// KeyManagerAWSKMS contains the config for the spire server AWS KMS key manager.
+	// +kubebuilder:validation:Optional
+	KeyManagerAWSKMS *KeyManagerAWSKMS `json:"keyManagerAWSKMS,omitempty"`
+}
+
+// KeyManagerMemory has the config required for the spire server memory key manager.
+type KeyManagerMemory struct {
+	// Memory key manager has no configuration parameters
+	// This struct exists for API consistency and future extensibility
 }
 
 // KeyManagerDisk has the config required for the spire server disk key manager.
@@ -25,17 +39,7 @@ type KeyManagerDisk struct {
 
 // AWSKMSConfig has the config required for the spire server AWS KMS key manager.
 type KeyManagerAWSKMS struct {
-	// accessKeyID is the AWS access key ID.
-	// +kubebuilder:validation:Optional
-	AccessKeyID string `json:"accessKeyID,omitempty"`
-
-	// secretAccessKey is the AWS secret access key.
-	// +kubebuilder:validation:Optional
-	SecretAccessKey string `json:"secretAccessKey,omitempty"`
-
-	// region is the AWS region.
-	// +kubebuilder:validation:Optional
-	Region string `json:"region,omitempty"`
+	AWSAccessConfig
 
 	// keyIdentifier is the AWS KMS key identifier.
 	// +kubebuilder:validation:Optional

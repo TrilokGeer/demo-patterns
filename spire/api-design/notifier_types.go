@@ -7,13 +7,17 @@ const (
 
 type Notifier struct {
 	// type specifies the type of notifier to use.
-	// +kubebuilder:validation:Enum=spire-server;spire-agent
-	// +kubebuilder:default:=spire-server
+	// +kubebuilder:validation:Enum=gcs_bundle;k8s_bundle
+	// +kubebuilder:default:=k8s_bundle
 	Type string `json:"type"`
 
-	// pluginConfig has the config required for the spire server notifier.
+	// NotifierGCSBundle contains the config for the GCS bundle notifier.
 	// +kubebuilder:validation:Optional
-	PluginConfig map[string]interface{} `json:"pluginConfig,omitempty"`
+	NotifierGCSBundle *NotifierGCSBundle `json:"gcsBundle,omitempty"`
+
+	// NotifierK8SBundle contains the config for the K8S bundle notifier.
+	// +kubebuilder:validation:Optional
+	NotifierK8SBundle *NotifierK8SBundle `json:"k8sBundle,omitempty"`
 }
 
 type NotifierGCSBundle struct {

@@ -1,31 +1,37 @@
 package v1alpha1
 
 const (
-	NodeAttestorTypeK8SPSAT  = "k8s_psat"
 	NodeAttestorTypeAWSIID   = "aws_iid"
-	NodeAttestorTypeGCPIIT   = "gcp_iit"
 	NodeAttestorTypeAzureMSI = "azure_msi"
+	NodeAttestorTypeGCPIIT   = "gcp_iit"
+	NodeAttestorTypeK8SPSAT  = "k8s_psat"
 )
 
 type NodeAttestor struct {
 	// type specifies the type of node attestor to use.
-	// +kubebuilder:validation:Enum=k8s_psat;k8s_sds;aws_iam;aws_iam_oidc;aws_ec2_s3;aws_ec2_iam;aws_ec2_iam_oidc;aws_ec2_iam_oidc_s3;aws_ec2_iam_oidc_s3_kms;aws_ec2_iam_oidc_s3_kms_disk;aws_ec2_iam_oidc_s3_kms_disk_memory;aws_ec2_iam_oidc_s3_kms_disk_memory_disk;aws_ec2_iam_oidc_s3_kms_disk_memory_disk_memory;aws_ec2_iam_oidc_s3_kms_disk_memory_disk_memory_disk;aws_ec2_iam_oidc_s3_kms_disk_memory_disk_memory_disk_memory;aws_ec2_iam_oidc_s3_kms_disk_memory_disk_memory_disk_memory_disk;aws_ec2_iam_oidc_s3_kms_disk_memory_disk_memory_disk_memory_disk
+	// +kubebuilder:validation:Enum=aws_iid;azure_msi;gcp_iit;k8s_psat
 	// +kubebuilder:default:=k8s_psat
 	Type string `json:"type"`
 
-	// pluginConfig has the config required for the spire server node attestor.
+	// NodeAttestorAWSIID contains the config for the AWS IID node attestor.
 	// +kubebuilder:validation:Optional
-	PluginConfig map[string]interface{} `json:"pluginConfig,omitempty"`
+	NodeAttestorAWSIID *NodeAttestorAWSIID `json:"awsIID,omitempty"`
+
+	// NodeAttestorGCPIIT contains the config for the GCP IIT node attestor.
+	// +kubebuilder:validation:Optional
+	NodeAttestorGCPIIT *NodeAttestorGCPIIT `json:"gcpIIT,omitempty"`
+
+	// NodeAttestorAzureMSI contains the config for the Azure MSI node attestor.
+	// +kubebuilder:validation:Optional
+	NodeAttestorAzureMSI *NodeAttestorAzureMSI `json:"azureMSI,omitempty"`
+
+	// NodeAttestorK8SPSAT contains the config for the K8S PSAT node attestor.
+	// +kubebuilder:validation:Optional
+	NodeAttestorK8SPSAT *NodeAttestorK8SPSAT `json:"k8sPSAT,omitempty"`
 }
 
 type NodeAttestorAWSIID struct {
-	// accessKeyID is the AWS access key ID.
-	// +kubebuilder:validation:Optional
-	AccessKeyID string `json:"accessKeyID,omitempty"`
-
-	// secretAccessKey is the AWS secret access key.
-	// +kubebuilder:validation:Optional
-	SecretAccessKey string `json:"secretAccessKey,omitempty"`
+	AWSAccessConfig
 
 	// skipBlockDevice is a flag to skip block device attestation.
 	// +kubebuilder:default:=false
@@ -129,10 +135,10 @@ type NodeAttestorGCPIIT struct {
 type NodeAttestorK8SPSAT struct {
 	// clusters is the map of clusters to configure.
 	// +kubebuilder:validation:Optional
-	Clusters map[string]*NodeAttenstorCluster `json:"clusters"`
+	Clusters map[string]*NodeAttestorCluster `json:"clusters"`
 }
 
-type NodeAttenstorCluster struct {
+type NodeAttestorCluster struct {
 	// allowedServiceAccounts is the list of allowed service accounts.
 	// +kubebuilder:validation:Optional
 	AllowedServiceAccounts map[string]bool `json:"allowedServiceAccounts"`
