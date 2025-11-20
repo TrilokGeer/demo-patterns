@@ -1,5 +1,5 @@
 set -euo pipefail
-set -x  # print each command as it runs
+#set -x  # print each command as it runs
 
 commands=(
         "oc new-project spire-mgmt"
