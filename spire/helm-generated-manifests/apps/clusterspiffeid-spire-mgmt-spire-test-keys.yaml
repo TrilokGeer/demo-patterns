@@ -1,0 +1,21 @@
+apiVersion: spire.spiffe.io/v1alpha1
+kind: ClusterSPIFFEID
+metadata:
+  name: spire-mgmt-spire-test-keys
+spec:
+  className: "spire-mgmt-spire"
+  hint: test-keys
+  spiffeIDTemplate: "spiffe://{{ .TrustDomain }}/ns/{{ .PodMeta.Namespace }}/sa/{{ .PodSpec.ServiceAccountName }}"
+  podSelector:
+    matchLabels:
+      component: test-keys
+      release: spire
+      release-namespace: spire-mgmt
+  namespaceSelector:
+    matchExpressions:
+    - key: kubernetes.io/metadata.name
+      operator: In
+      values:
+      - spire-mgmt
+      - spire-server
+      - spire-system

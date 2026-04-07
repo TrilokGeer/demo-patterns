@@ -1,0 +1,39 @@
+apiVersion: security.openshift.io/v1
+kind: SecurityContextConstraints
+metadata:
+  name: spire-spiffe-oidc-discovery-provider
+readOnlyRootFilesystem: true
+runAsUser:
+  type: RunAsAny
+seLinuxContext:
+  type: RunAsAny
+supplementalGroups:
+  type: RunAsAny
+users:
+  - system:serviceaccount:spire-mgmt:spire-spiffe-oidc-discovery-provider
+  - system:serviceaccount:spire-mgmt:spire-spiffe-oidc-discovery-provider-pre-delete
+volumes:
+  - configMap
+  - csi
+  - downwardAPI
+  - emptyDir
+  - ephemeral
+  - hostPath
+  - projected
+  - secret
+allowedCapabilities: null
+allowHostDirVolumePlugin: true
+allowHostIPC: true
+allowHostNetwork: true
+allowHostPID: true
+allowHostPorts: true
+allowPrivilegeEscalation: true
+allowPrivilegedContainer: true
+defaultAddCapabilities: null
+fsGroup:
+  type: RunAsAny
+groups: []
+priority: null
+requiredDropCapabilities: null
+seccompProfiles:
+  - '*'

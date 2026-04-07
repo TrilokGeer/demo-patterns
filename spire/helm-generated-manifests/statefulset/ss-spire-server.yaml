@@ -1,0 +1,196 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: spire-server
+  namespace: spire-mgmt
+  labels:
+#    helm.sh/chart: spire-server-0.1.0
+    app.kubernetes.io/name: server
+    app.kubernetes.io/instance: spire
+    app.kubernetes.io/version: "1.11.2"
+#    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/managed-by: ztwim
+    app.kubernetes.io/component: server
+spec:
+  replicas: 1
+  serviceName: spire-server
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: server
+      app.kubernetes.io/instance: spire
+      app.kubernetes.io/component: server
+  template:
+    metadata:
+      annotations:
+        kubectl.kubernetes.io/default-container: spire-server
+        checksum/config: 9930f035cece73e01c8285bc281daf0ffba42c08b1bb1acaeea1ab8263f62c6e
+        checksum/config2: 01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b
+        checksum/config3: 25e3d821b777ac3c2b101883b3b5a19d34d62a0bb5adaa9826c1d9ee1781de91
+        checksum/configTornjak: af0eae9cf488afbf4fe3d291c88bc9250fcc16f7fca01a059299762b02578d9e
+      labels:
+        app.kubernetes.io/name: server
+        app.kubernetes.io/instance: spire
+        app.kubernetes.io/component: server
+        component: server
+        release: spire
+        release-namespace: spire-mgmt
+    spec:
+      serviceAccountName: spire-server
+      shareProcessNamespace: true
+      securityContext:
+        {}
+
+      containers:
+        - name: spire-server
+          securityContext:
+            {}
+          image: "ghcr.io/spiffe/spire-server:1.11.2"
+          imagePullPolicy: IfNotPresent
+          args:
+            - -expandEnv
+            - -config
+            - /run/spire/config/server.conf
+          env:
+          - name: PATH
+            value: "/opt/spire/bin:/bin"
+          ports:
+            - name: grpc
+              containerPort: 8081
+              protocol: TCP
+            - containerPort: 8080
+              name: healthz
+          livenessProbe:
+            httpGet:
+              path: /live
+              port: healthz
+            failureThreshold: 2
+            initialDelaySeconds: 15
+            periodSeconds: 60
+            timeoutSeconds: 3
+          readinessProbe:
+            httpGet:
+              path: /ready
+              port: healthz
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          resources:
+            {}
+          volumeMounts:
+            - name: spire-server-socket
+              mountPath: /tmp/spire-server/private
+              readOnly: false
+            - name: spire-config
+              mountPath: /run/spire/config
+              readOnly: true
+            - name: spire-data
+              mountPath: /run/spire/data
+              readOnly: false
+            - name: server-tmp
+              mountPath: /tmp
+              readOnly: false
+
+        - name: spire-controller-manager
+          securityContext:
+            {}
+          image: "ghcr.io/spiffe/spire-controller-manager:0.6.0"
+          imagePullPolicy: IfNotPresent
+          args:
+            - --config=controller-manager-config.yaml
+          env:
+            - name: ENABLE_WEBHOOKS
+              value: "true"
+          ports:
+            - name: https
+              containerPort: 9443
+              protocol: TCP
+            - containerPort: 8083
+              name: healthz
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: healthz
+          readinessProbe:
+            httpGet:
+              path: /readyz
+              port: healthz
+          resources:
+            {}
+          volumeMounts:
+            - name: spire-server-socket
+              mountPath: /tmp/spire-server/private
+              readOnly: true
+            - name: controller-manager-config
+              mountPath: /controller-manager-config.yaml
+              subPath: controller-manager-config.yaml
+              readOnly: true
+            - name: spire-controller-manager-tmp
+              mountPath: /tmp
+              subPath: spire-controller-manager
+              readOnly: false
+        - name: tornjak
+          securityContext:
+            {}
+          image: "ghcr.io/spiffe/tornjak-backend:ubi-v1.6.0"
+          imagePullPolicy: IfNotPresent
+          startupProbe:
+            httpGet:
+              scheme: HTTP
+              path: /
+              port: 10000
+            failureThreshold: 3
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 5
+          args:
+            - --spire-config
+            - /run/spire/config/server.conf
+            - --tornjak-config
+            - /run/spire/tornjak-config/server.conf
+          ports:
+            - name: tornjak-http
+              containerPort: 10000
+              protocol: TCP
+            - name: tornjak-https
+              containerPort: 10443
+              protocol: TCP
+          resources:
+            {}
+          volumeMounts:
+            - name: spire-tornjak-config
+              mountPath: /run/spire/tornjak-config
+            - name: spire-server-socket
+              mountPath: /tmp/spire-server/private
+              readOnly: true
+            - name: spire-config
+              mountPath: /run/spire/config
+              readOnly: true
+            - name: spire-data
+              mountPath: /run/spire/data
+              readOnly: false
+      volumes:
+        - name: server-tmp
+          emptyDir: {}
+        - name: spire-config
+          configMap:
+            name: spire-server
+        - name: spire-server-socket
+          emptyDir: {}
+        - name: spire-controller-manager-tmp
+          emptyDir: {}
+        - name: controller-manager-config
+          configMap:
+            name: spire-controller-manager
+        - name: spire-tornjak-config
+          configMap:
+            defaultMode: 420
+            name: spire-tornjak-config
+  volumeClaimTemplates:
+    - metadata:
+        name: spire-data
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: 1Gi
